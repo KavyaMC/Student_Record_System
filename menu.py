@@ -1,8 +1,32 @@
 import os
 
+def lowest_marks(students):
+	lowest_marks=students[0]["marks"]
+	for student in students:
+		if student["marks"] < lowest_marks:
+			lowest_marks=student["marks"]
+	return lowest_marks
+
+
+def highest_marks(students):
+	highest_marks=0
+	for student in students:
+		if students["marks"] > highest_marks:
+			highest_marks=students["marks"]
+	return highest_marks
+
+
+def average_marks(students):
+	return total_marks(students)/len(students)
+
+def total_marks(students):
+	total=0
+	for student in students:
+		total+=student["marks"]
+	return total
+
 def read_students(file_name):
 	student_data=[]
-	file_name="students.txt"
 	with open(file_name, "r") as f:
 		for line in f:
 			data={}
