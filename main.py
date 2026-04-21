@@ -2,7 +2,7 @@ import os
 class_a = ['Amit', 'anisha ', 'KAVYA', 'pratham']
 class_b = [' Pooja', 'Varsha', 'kavya', 'Rahul']
 full_roll = {'Amit', ' Anisha ', 'KAVYA', 'Pratham', 'Pooja', 'Varsha', 'Shubham', 'Virat', 'Shiva'}
-
+marks_matrix = [[88, 95, 52], [73, 61, 91], [67, 84, 78]]
 
 
 def read_students(file_name):
@@ -150,6 +150,7 @@ def find_absent_students(present, full_roll):
 	line=", ".join(absent)
 	return f"absent students: {line}"
 
+# Part 6 — Honour Roll and Logging
 def passing_students(students):
 	passing=[]
 	for student in students:
@@ -162,11 +163,39 @@ def honour_roll(students):
 	passing=passing_students(students)
 	average=average_marks(students)
 	honour_roll=[]
-	for student in students:
+	for student in passing:
 		if student["marks"] > average:
 			name=student["name"].strip().capitalize()
 			honour_roll.append(name)
 	return honour_roll
+
+def log_honour_roll(filename, students):
+	studentlist=honour_roll(students)
+	line= ", ".join(studentlist)
+	try:
+		with open(filename, "a") as f:
+			f.write(line+"\n")
+		return "log updated"
+	except OSError as e:
+		return "error: log not updated. {e}"
+
+def row_average(matrix):
+	AverageList=[]
+	for student in matrix:
+		total=0
+		for score in student:
+			total+=score
+		average=round(total/len(student),1)
+		AverageList.append(average)
+	return AverageList
+
+def enforce_pass_threshold(matrix, threshold):
+	averagelist=row_average(matrix)
+	for index, average in enumerate(averagelist, start=1):
+		if average < threshold:
+			return f"Row {index} below threshold — stopping."
+	else:
+		return "All rows meet threshold."
 
 # Part 1 — The Interactive Menu
 def class_menu():
@@ -200,7 +229,7 @@ def class_menu():
 				print(write_report("report.txt", students))
 
 			case "2":
-				print("in development")
+				print(log_honour_roll("report.txt", students))
 			case "3":
 				data=input("Enter names (comma separated): ")
 				present=data.split(",")
@@ -215,6 +244,8 @@ def class_menu():
 			case "7":
 				print("In development")
 			case "0":
+				print(enforce_pass_threshold(marks_matrix, 76.5))
+				input("Press enter to continue")
 				print("exiting program")
 				break
 			case _:
