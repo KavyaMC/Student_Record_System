@@ -4,8 +4,9 @@ class_b = [' Pooja', 'Varsha', 'kavya', 'Rahul']
 full_roll = {'Amit', ' Anisha ', 'KAVYA', 'Pratham', 'Pooja', 'Varsha', 'Shubham', 'Virat', 'Shiva'}
 
 
+
 def read_students(file_name):
-	student_data=[]
+	students=[]
 
 	try:
 		with open(file_name, "r") as f:
@@ -19,11 +20,11 @@ def read_students(file_name):
 				data["name"]=str(parts[0]).strip().title()
 				data["marks"]=int(parts[1])
 				data["grade"]=str(parts[2]).strip().upper()
-				student_data.append(data)
+				students.append(data)
 
 	except FileNotFoundError:
 		print("students.txt not found")
-	return student_data
+	return students
 
 # Part 3 — Score Analysis
 def total_marks(students):
@@ -144,17 +145,35 @@ def compare_classes(list_a, list_b):
 	return shared_students(list(clean_a), list(clean_b))
 
 def find_absent_students(present, full_roll):
-
 	result = compare_classes(full_roll, present)
+	absent=result["only_in_a"]
+	line=", ".join(absent)
+	return f"absent students: {line}"
 
-	return result["only_in_a"]
+def passing_students(students):
+	passing=[]
+	for student in students:
+		if student["grade"]=="F":
+			continue
+		passing.append(student)
+	return passing
+
+def honour_roll(students):
+	passing=passing_students(students)
+	average=average_marks(students)
+	honour_roll=[]
+	for student in students:
+		if student["marks"] > average:
+			name=student["name"].strip().capitalize()
+			honour_roll.append(name)
+	return honour_roll
 
 # Part 1 — The Interactive Menu
 def class_menu():
-	student_data=read_students("students.txt")
+	students=read_students("students.txt")
 	while True:
 		print("--Main Menu--")
-		print(f"{len(student_data)} records were loaded")
+		print(f"{len(students)} records were loaded")
 		print("1. Write class report")
 		print("2. Log honour roll")
 		print("3. Compare classes / find absent students")
@@ -166,15 +185,24 @@ def class_menu():
 		choice=input("Enter your choice: ")
 		match choice:
 			case "1":
-				print(f"---CLASS REPORT---\n")
-				for key, value in class_report(student_data).items():
+
+				print(f"---CLASS REPORT---")
+				for key, value in class_report(students).items():
 					print(f"{key}: {value}")
-				print(write_report("report.txt", student_data))
+
+				print(f"---GRADE SHEET---")
+				for key, value in count_by_grade(students).items():
+					print(f"{key}: {value}")
+
+				print(f"---TOP GRADE---")
+				print(top_grade(students)+"\n")
+
+				print(write_report("report.txt", students))
 
 			case "2":
-				print("In development")
+				print("in development")
 			case "3":
-				data=input("Enter names (comma seperated): ")
+				data=input("Enter names (comma separated): ")
 				present=data.split(",")
 				print(find_absent_students(set(present), full_roll))
 
