@@ -4,7 +4,7 @@ class_b = [' Pooja', 'Varsha', 'kavya', 'Rahul']
 full_roll = {'Amit', ' Anisha ', 'KAVYA', 'Pratham', 'Pooja', 'Varsha', 'Shubham', 'Virat', 'Shiva'}
 marks_matrix = [[88, 95, 52], [73, 61, 91], [67, 84, 78]]
 
-
+# Part 2 — The Data Source
 def read_students(file_name):
 	students=[]
 
@@ -179,6 +179,7 @@ def log_honour_roll(filename, students):
 	except OSError as e:
 		return "error: log not updated. {e}"
 
+# Part 7 — Nested Lists and the break Keyword
 def row_average(matrix):
 	AverageList=[]
 	for student in matrix:
@@ -197,7 +198,49 @@ def enforce_pass_threshold(matrix, threshold):
 	else:
 		return "All rows meet threshold."
 
-# Part 1 — The Interactive Menu
+# Part 8 — Updating Records
+def update_student_file(filename, name, new_score):
+	students=read_students(filename)
+
+	for student in students:
+
+		if student["name"].lower() == name.strip().lower():
+			student["marks"] = new_score
+
+			if new_score>90:
+				student["grade"]="A"
+			elif new_score > 75:
+				student["grade"]="B"
+			elif new_score > 60:
+				student["grade"]="C"
+			elif new_score > 50:
+				student["grade"]="D"
+
+			else:
+				student["grade"]="F"
+
+	try:
+		with open(filename, "w") as f:
+			for student in students:
+				line= f"{student["name"]} {student["marks"]} {student["grade"]}"
+				f.write(line+"\n")
+		return "student records changed successfully"
+
+	except OSError as e:
+		return f"error: file not updated: {e}"
+	return "student record not found"
+
+# Part 9 — The os Module — First Pass
+def safe_delete(filename):
+	try:
+		if os.path.exists(filename):
+			os.remove(filename)
+			print(F"{filename} deleted")
+	except:
+		("error")
+
+
+# Part 1 — The Interactive Menu	try:
 def class_menu():
 	students=read_students("students.txt")
 	while True:
@@ -236,7 +279,10 @@ def class_menu():
 				print(find_absent_students(set(present), full_roll))
 
 			case "4":
-				print("In development")
+				name=input("Enter student name: ")
+				new_score=int(input("Enter revised student marks: "))
+				print(update_student_file("students.txt", name, new_score))
+
 			case "5":
 				print("In development")
 			case "6":
