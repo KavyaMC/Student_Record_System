@@ -3,6 +3,7 @@ class_a = ['Amit', 'anisha ', 'KAVYA', 'pratham']
 class_b = [' Pooja', 'Varsha', 'kavya', 'Rahul']
 full_roll = {'Amit', ' Anisha ', 'KAVYA', 'Pratham', 'Pooja', 'Varsha', 'Shubham', 'Virat', 'Shiva'}
 marks_matrix = [[88, 95, 52], [73, 61, 91], [67, 84, 78]]
+student_ids = [2101, 2134, 2108, 2147, 2115, 2129, 2156, 2163, 2172]
 
 # Part 2 — The Data Source
 def read_students(file_name):
@@ -34,9 +35,14 @@ def total_marks(students):
 	return total
 
 def average_marks(students):
+	if len(students)==0:
+		return 0
 	return round(total_marks(students)/len(students),2)
 
 def highest_marks(students):
+	if len(students)==0:
+		return 0
+
 	highest_marks=students[0]["marks"]
 	for student in students:
 		if student["marks"] > highest_marks:
@@ -44,6 +50,9 @@ def highest_marks(students):
 	return highest_marks
 
 def lowest_marks(students):
+	if len(students)==0:
+		return 0
+
 	lowest_marks=students[0]["marks"]
 	for student in students:
 		if student["marks"] < lowest_marks:
@@ -165,7 +174,7 @@ def honour_roll(students):
 	honour_roll=[]
 	for student in passing:
 		if student["marks"] > average:
-			name=student["name"].strip().capitalize()
+			name=student["name"].strip().title()
 			honour_roll.append(name)
 	return honour_roll
 
@@ -177,7 +186,7 @@ def log_honour_roll(filename, students):
 			f.write(line+"\n")
 		return "log updated"
 	except OSError as e:
-		return "error: log not updated. {e}"
+		return f"error: log not updated. {e}"
 
 # Part 7 — Nested Lists and the break Keyword
 def row_average(matrix):
@@ -207,38 +216,86 @@ def update_student_file(filename, name, new_score):
 		if student["name"].lower() == name.strip().lower():
 			student["marks"] = new_score
 
-			if new_score>90:
+			if new_score >= 90:
 				student["grade"]="A"
-			elif new_score > 75:
+			elif new_score >= 75:
 				student["grade"]="B"
-			elif new_score > 60:
+			elif new_score >= 60:
 				student["grade"]="C"
-			elif new_score > 50:
+			elif new_score >= 50:
 				student["grade"]="D"
 
 			else:
 				student["grade"]="F"
 
-	try:
-		with open(filename, "w") as f:
-			for student in students:
-				line= f"{student["name"]} {student["marks"]} {student["grade"]}"
-				f.write(line+"\n")
-		return "student records changed successfully"
+			try:
+				with open(filename, "w") as f:
+					for s in students:
+						line= f"{s['name']} {s['marks']} {s['grade']}"
+						f.write(line+"\n")
+				return "student records changed successfully"
 
-	except OSError as e:
-		return f"error: file not updated: {e}"
+			except OSError as e:
+				return f"error: file not updated: {e}"
 	return "student record not found"
 
 # Part 9 — The os Module — First Pass
 def safe_delete(filename):
-	try:
-		if os.path.exists(filename):
-			os.remove(filename)
-			print(F"{filename} deleted")
-	except:
-		("error")
+	if os.path.isfile(filename):
+		os.remove(filename)
+		return f"{filename} deleted."
+	else:
+		return f"{filename} not found."
 
+def list_class_files(directory):
+	original = os.getcwd()
+	if not os.path.exists("records"):
+		os.mkdir("records")
+		files=["class1.txt", "class2.txt", "notes.txt", "old_backup.txt", "old_report.txt"]
+		for name in files:
+			path = os.path.join("records", name)
+			with open(path, "w") as f:
+				f.write("Sample content\n")
+
+	try:
+		os.chdir(directory)
+		data = os.listdir()
+		text_files = []
+
+		for f in data:
+			if os.path.isfile(f) and f.endswith(".txt"):
+				if f.startswith("old_"):
+					print(safe_delete(f))
+				else:
+					text_files.append(f)
+
+	except FileNotFoundError:
+		return "Directory not found."
+
+	finally:
+		os.chdir(original)
+	return text_files
+
+#Part 10 — While Loops and Input Validation
+def search_by_id(student_ids, target_id):
+	counter=0
+	while counter < len(student_ids):
+		if student_ids[counter]==target_id:
+			return counter
+		counter+=1
+	return -1
+
+def get_valid_integer(prompt, low, high):
+	while True:
+		try:
+			num=int(input(prompt))
+			if low <= num <= high:
+				return num
+			else:
+				print(f"Value must be between {low} and {high}.")
+
+		except ValueError:
+			print("Invalid input, please try again.")
 
 # Part 1 — The Interactive Menu	try:
 def class_menu():
@@ -281,12 +338,22 @@ def class_menu():
 			case "4":
 				name=input("Enter student name: ")
 				new_score=int(input("Enter revised student marks: "))
-				print(update_student_file("students.txt", name, new_score))
+				result = update_student_file("students.txt", name, new_score)
+				print(result)
+				students = read_students("students.txt")
+
 
 			case "5":
-				print("In development")
+				id_value = get_valid_integer(		"Enter student ID: ", 2000, 3000)
+				position = search_by_id(student_ids, id_value)
+				if position == -1:
+					print("Student ID not found.")
+				else:
+					print(f"Student ID found at position {position}.")
+
 			case "6":
-				print("In development")
+				print(list_class_files("records"))
+				print(safe_delete("old_report.txt"))
 			case "7":
 				print("In development")
 			case "0":
