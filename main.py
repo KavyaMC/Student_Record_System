@@ -297,6 +297,44 @@ def get_valid_integer(prompt, low, high):
 		except ValueError:
 			print("Invalid input, please try again.")
 
+# Part 11 — The Report Card
+def read_summary_lines(filename):
+	report={}
+	with open(filename, "r") as f:
+		report["first_line"]=f.readline().strip()
+		report["remaining_lines"]=f.readlines()
+	return report
+
+def print_report_card(student, students):
+	data=read_summary_lines("report.txt")
+	print(data["first_line"]+"\n")
+	name=student["name"].strip().title()
+	honour_names=honour_roll(students)
+	if name in honour_names:
+		status="HONOUR ROLL"
+	else:
+		status="STANDARD"
+	print("-------------------------")
+	print(f"Student: {name}")
+	print(f"Score:   {student['marks']}")
+	print(f"Grade:   {student['grade']}")
+	print(f"Status:  {status}")
+	print("-------------------------")
+
+def celebrate_student(name, streak, score, grade):
+	new_streak = streak + 1
+	stars="*"*new_streak
+	unit="day" if streak==1 else "days"
+	opening="WELL DONE" if score>=75 else "KEEP GOING"
+	name=name.strip().title()
+	message=(
+		f"{stars} {opening}, {name}! "
+		f"Score: {score} | "
+		f"Grade: {grade} | "
+		f"Streak: {new_streak} {unit}."
+	)
+	return message
+
 # Part 1 — The Interactive Menu	try:
 def class_menu():
 	students=read_students("students.txt")
@@ -342,7 +380,6 @@ def class_menu():
 				print(result)
 				students = read_students("students.txt")
 
-
 			case "5":
 				id_value = get_valid_integer(		"Enter student ID: ", 2000, 3000)
 				position = search_by_id(student_ids, id_value)
@@ -355,7 +392,14 @@ def class_menu():
 				print(list_class_files("records"))
 				print(safe_delete("old_report.txt"))
 			case "7":
-				print("In development")
+					name = input("Enter student name: ")
+					for student in students:
+						if student["name"].lower() == name.strip().lower():
+							print_report_card(student, students)
+							print(				celebrate_student(student["name"], 0, student["marks"], student["grade"]))
+							break
+					else:
+						print("Student not found.")
 			case "0":
 				print(enforce_pass_threshold(marks_matrix, 76.5))
 				input("Press enter to continue")
