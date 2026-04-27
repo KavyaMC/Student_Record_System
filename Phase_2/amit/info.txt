@@ -1,0 +1,3 @@
+name: Amit
+marks: 88
+grade: B

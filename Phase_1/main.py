@@ -251,7 +251,7 @@ def list_class_files(directory):
 	original = os.getcwd()
 	if not os.path.exists("records"):
 		os.mkdir("records")
-		files=["class1.txt", "class2.txt", "notes.txt", "old_backup.txt", "old_report.txt"]
+		files=["info.txt", "attendence.txt", "notes.txt", "old_backup.txt", "old_report.txt"]
 		for name in files:
 			path = os.path.join("records", name)
 			with open(path, "w") as f:
