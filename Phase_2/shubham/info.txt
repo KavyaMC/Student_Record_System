@@ -1,3 +1,0 @@
-name: Shubham
-marks: 67
-grade: C

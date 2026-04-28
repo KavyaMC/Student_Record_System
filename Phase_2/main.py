@@ -1,4 +1,6 @@
 import os
+from ..Phase_1.main import write_report, log_honour_roll, compare_classes
+
 student_list = [
 	{'name':'Amit',   'score':88,'grade':'B','attendance':[18,20,17,19],'note':'Consistent and focused.'},
 	{'name':'Anisha', 'score':95,'grade':'A','attendance':[20,20,19,20],'note':'Exceptional work ethic.'},
@@ -17,34 +19,67 @@ class_b = [' Pooja', 'Varsha', 'kavya', 'Rahul']
 # Part 13 — Building the File System
 def setup_student_folders(base_folder, student_list):
 	os.makedirs(base_folder, exist_ok=True)
-	os.chdir(base_folder)
-	for student in student_list:
-		folder_name=student["name"].lower()
-		try:
-			os.makedirs(folder_name, exist_ok=True)
-		except FileExistsError:
-			pass
 
-		os.chdir(folder_name)
-		with open("info.txt", "w") as f:
+	for student in student_list:
+		folder_name = student["name"].lower()
+
+		folder_path = os.path.join(base_folder, folder_name)
+		os.makedirs(folder_path, exist_ok=True)
+
+		with open(os.path.join(folder_path, "info.txt"), "w") as f:
 			f.write(
 				f"name: {student['name'].strip().title()}\n"
-				f"marks: {int(student['score'])}\n"
+				f"score: {int(student['score'])}\n"
 				f"grade: {student['grade'].strip().upper()}\n"
 			)
 
-		with open("attendance.txt", "w") as f:
+		with open(os.path.join(folder_path, "attendance.txt"), "w") as f:
 			for session in student["attendance"]:
 				f.write(f"{session}\n")
 
-		with open("notes.txt", "w") as f:
-			f.write(student["note"])
+		with open(os.path.join(folder_path, "notes.txt"), "w") as f:
+			f.write(student["note"] + "\n")
+	return "setup complete."
 
-		os.chdir(base_folder)
-	return "setup complete"
+# Part 14 — Reading the File System
+def read_student_info(student_folder):
+	try:
+		student={}
+		with open(os.path.join(student_folder, "info.txt"), "r") as f:
+			for line in f:
+				parts=line.strip().split(":", 1)
+				if len(parts)==2:
+					key=parts[0].strip()
+					value=parts[1].strip()
+
+					if key=="score":
+						value=int(value)
+
+					student[key]=value
+
+		return student
+
+	except FileNotFoundError:
+		return None
+
+def read_all_students(base_folder):
+	folders=[]
+	students=[]
+
+	for student in student_list:
+		folder_name=student["name"].lower()
+		folders.append(folder_name)
+
+	for folder in folders:
+		info=read_student_info(os.path.join(base_folder, folder))
+
+		if info is not None:
+			students.append(info)
+	return students
 
 # Part 12 — The Phase 2 Menu
 def class_menu():
+
 	options=[
 		"Rebuild student folders",
 		"Write class report",
@@ -56,27 +91,39 @@ def class_menu():
 		"List student folders",
 		"Student report card"
 	]
+
+	base_folder="Phase_2/"
+	students=read_all_students(base_folder)
+
 	while True:
 		print("---Main Menu---")
+		print(f"{len(students)} records were loaded")
+
 		for index, option in enumerate(options, start=1):
 			print(f"{index}: {option}")
 
 		print("0: exit")
-		choice=input("Enter a choice: ").strip()
-		match choice:
 
+		choice=input("Enter a choice: ").strip()
+
+		match choice:
 			case "1":
-				print(setup_student_folders(r"C:\Users\admin\Documents\GitHub\Student_Record_System\Phase_2", student_list))
+				print(setup_student_folders(base_folder, student_list))
+				students=read_all_students(base_folder)
+
 			case "2":
-				print(f"{options[int(choice)-1]} in development")
+				print(write_report("report.txt", students))
+
 			case "3":
-				print(f"{options[int(choice)-1]} in development")
+				print(log_honour_roll(students))
+
 			case "4":
 				print(f"{options[int(choice)-1]} in development")
 			case "5":
 				print(f"{options[int(choice)-1]} in development")
 			case "6":
-				print(f"{options[int(choice)-1]} in development")
+				print(compare_classes(class_a, class_b))
+
 			case "7":
 				print(f"{options[int(choice)-1]} in development")
 			case "8":
@@ -86,8 +133,10 @@ def class_menu():
 			case "0":
 				print("Good bye")
 				break
+
 			case _:
 				print("invalid choice. Please try again")
+
 
 if __name__=="__main__":
 	class_menu()

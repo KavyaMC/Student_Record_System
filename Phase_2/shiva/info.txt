@@ -1,3 +1,0 @@
-name: Shiva
-marks: 78
-grade: B

@@ -335,7 +335,7 @@ def celebrate_student(name, streak, score, grade):
 	)
 	return message
 
-# Part 1 — The Interactive Menu	try:
+# Part 1 — The Interactive Menu
 def class_menu():
 	students=read_students("students.txt")
 	while True:
@@ -407,4 +407,6 @@ def class_menu():
 				break
 			case _:
 				print("invalid choice.")
-class_menu()
+
+if __name__ == "__main__":
+	class_menu()

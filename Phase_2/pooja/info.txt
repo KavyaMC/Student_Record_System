@@ -1,3 +1,0 @@
-name: Pooja
-marks: 61
-grade: D

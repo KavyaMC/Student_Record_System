@@ -1,3 +1,0 @@
-name: Virat
-marks: 84
-grade: B

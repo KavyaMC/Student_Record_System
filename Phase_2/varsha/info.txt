@@ -1,3 +1,0 @@
-name: Varsha
-marks: 91
-grade: A
