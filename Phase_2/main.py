@@ -1,5 +1,5 @@
 import os
-from ..Phase_1.main import write_report, log_honour_roll, compare_classes
+from Phase_1.main import write_report, log_honour_roll, compare_classes, find_absent_students
 
 student_list = [
 	{'name':'Amit',   'score':88,'grade':'B','attendance':[18,20,17,19],'note':'Consistent and focused.'},
@@ -77,6 +77,33 @@ def read_all_students(base_folder):
 			students.append(info)
 	return students
 
+# Part 15 — Attendance
+def write_attendance(student_folder, sessions):
+	try:
+		with open(student_folder+"/attendance.txt", "a") as f:
+			for number in sessions:
+				f.write(str(number)+"\n")
+		return "success! Attendence updated"
+	except FileNotFoundError as e:
+		return f"error: Failed! {e}"
+
+def read_attendance(student_folder):
+	attendance_list=[]
+	try:
+		with open(student_folder+"/attendance.txt", "r") as f:
+			data=f.readlines()
+			for line in data:
+				attendance_list.append(int(line))
+		return attendance_list
+	except:
+		return []
+
+def total_attendance(student_folder):
+	numbers=read_attendance(student_folder)
+	total=0
+	for number in numbers:
+		total+=number
+	return total
 # Part 12 — The Phase 2 Menu
 def class_menu():
 
@@ -115,7 +142,7 @@ def class_menu():
 				print(write_report("report.txt", students))
 
 			case "3":
-				print(log_honour_roll(students))
+				print(log_honour_roll("report.txt", student_list))
 
 			case "4":
 				print(f"{options[int(choice)-1]} in development")
@@ -123,6 +150,11 @@ def class_menu():
 				print(f"{options[int(choice)-1]} in development")
 			case "6":
 				print(compare_classes(class_a, class_b))
+				present=input("Enter student names, (comma separated): ").split(",")
+				full_roll=[]
+				for student in students:
+					full_roll.append(student["name"])
+				print(find_absent_students(set(present), full_roll))
 
 			case "7":
 				print(f"{options[int(choice)-1]} in development")
@@ -136,7 +168,6 @@ def class_menu():
 
 			case _:
 				print("invalid choice. Please try again")
-
 
 if __name__=="__main__":
 	class_menu()

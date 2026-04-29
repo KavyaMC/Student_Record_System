@@ -19,7 +19,7 @@ def read_students(file_name):
 
 				data={}
 				data["name"]=str(parts[0]).strip().title()
-				data["marks"]=int(parts[1])
+				data["score"]=int(parts[1])
 				data["grade"]=str(parts[2]).strip().upper()
 				students.append(data)
 
@@ -31,7 +31,7 @@ def read_students(file_name):
 def total_marks(students):
 	total=0
 	for student in students:
-		total+=student["marks"]
+		total+=student["score"]
 	return total
 
 def average_marks(students):
@@ -43,35 +43,35 @@ def highest_marks(students):
 	if len(students)==0:
 		return 0
 
-	highest_marks=students[0]["marks"]
+	highest_marks=students[0]["score"]
 	for student in students:
-		if student["marks"] > highest_marks:
-			highest_marks=student["marks"]
+		if student["score"] > highest_marks:
+			highest_marks=student["score"]
 	return highest_marks
 
 def lowest_marks(students):
 	if len(students)==0:
 		return 0
 
-	lowest_marks=students[0]["marks"]
+	lowest_marks=students[0]["score"]
 	for student in students:
-		if student["marks"] < lowest_marks:
-			lowest_marks=student["marks"]
+		if student["score"] < lowest_marks:
+			lowest_marks=student["score"]
 	return lowest_marks
 
 def above_average_students(students):
 	average= average_marks(students)
 	above_average=[]
 	for student in students:
-		if student["marks"] > average:
-			data={"name": student["name"], "marks": student["marks"]}
+		if student["score"] > average:
+			data={"name": student["name"], "score": student["score"]}
 			above_average.append(data)
 	return above_average
 
 def count_range(students, low, high):
 	count=0
 	for student in students:
-		if low <= student["marks"] <= high:
+		if low <= student["score"] <= high:
 			count+=1
 	return count
 
@@ -173,7 +173,7 @@ def honour_roll(students):
 	average=average_marks(students)
 	honour_roll=[]
 	for student in passing:
-		if student["marks"] > average:
+		if student["score"] > average:
 			name=student["name"].strip().title()
 			honour_roll.append(name)
 	return honour_roll
@@ -214,7 +214,7 @@ def update_student_file(filename, name, new_score):
 	for student in students:
 
 		if student["name"].lower() == name.strip().lower():
-			student["marks"] = new_score
+			student["score"] = new_score
 
 			if new_score >= 90:
 				student["grade"]="A"
@@ -396,7 +396,7 @@ def class_menu():
 					for student in students:
 						if student["name"].lower() == name.strip().lower():
 							print_report_card(student, students)
-							print(				celebrate_student(student["name"], 0, student["marks"], student["grade"]))
+							print(				celebrate_student(student["name"], 0, student["score"], student["grade"]))
 							break
 					else:
 						print("Student not found.")
@@ -407,6 +407,3 @@ def class_menu():
 				break
 			case _:
 				print("invalid choice.")
-
-if __name__ == "__main__":
-	class_menu()
