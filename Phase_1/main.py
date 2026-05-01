@@ -121,7 +121,7 @@ def write_report(filename, students):
 	lines.append("---GRADE BREAKDOWN---\n")
 	for key, value in grade_count.items():
 		grade_parts.append(f"{key}: {value}")
-		grade_line=", ".join(grade_parts)
+	grade_line=", ".join(grade_parts)
 	lines.append(f"{grade_line}\n")
 
 	lines.append("---TOP GRADE---\n")
@@ -231,7 +231,7 @@ def update_student_file(filename, name, new_score):
 			try:
 				with open(filename, "w") as f:
 					for s in students:
-						line= f"{s['name']} {s['marks']} {s['grade']}"
+						line= f"{s['name']} {s['score']} {s['grade']}"
 						f.write(line+"\n")
 				return "student records changed successfully"
 
@@ -249,11 +249,11 @@ def safe_delete(filename):
 
 def list_class_files(directory):
 	original = os.getcwd()
-	if not os.path.exists("records"):
-		os.mkdir("records")
-		files=["info.txt", "attendence.txt", "notes.txt", "old_backup.txt", "old_report.txt"]
+	if not os.path.exists(directory):
+		os.mkdir(directory)
+		files=["info.txt", "attendance.txt", "notes.txt", "old_backup.txt", "old_report.txt"]
 		for name in files:
-			path = os.path.join("records", name)
+			path = os.path.join(directory, name)
 			with open(path, "w") as f:
 				f.write("Sample content\n")
 
@@ -300,23 +300,30 @@ def get_valid_integer(prompt, low, high):
 # Part 11 — The Report Card
 def read_summary_lines(filename):
 	report={}
-	with open(filename, "r") as f:
-		report["first_line"]=f.readline().strip()
-		report["remaining_lines"]=f.readlines()
-	return report
+	try:
+		with open(filename, "r") as f:
+			report["first_line"]=f.readline().strip()
+			report["remaining_lines"]=f.readlines()
+		return report
+	except FileNotFoundError:
+		report["first_line"]="No report available"
+		report["remaining_lines"]=[]
+		return report
 
 def print_report_card(student, students):
 	data=read_summary_lines("report.txt")
 	print(data["first_line"]+"\n")
 	name=student["name"].strip().title()
 	honour_names=honour_roll(students)
-	if name in honour_names:
-		status="HONOUR ROLL"
+	for n in honour_names:
+		if name.lower() == n.lower():
+			status = "HONOUR ROLL"
+			break
 	else:
 		status="STANDARD"
 	print("-------------------------")
 	print(f"Student: {name}")
-	print(f"Score:   {student['marks']}")
+	print(f"Score:   {student['score']}")
 	print(f"Grade:   {student['grade']}")
 	print(f"Status:  {status}")
 	print("-------------------------")
@@ -370,7 +377,10 @@ def class_menu():
 				print(log_honour_roll("report.txt", students))
 			case "3":
 				data=input("Enter names (comma separated): ")
-				present=data.split(",")
+				raw = data.split(",")
+				present = set()
+				for name in raw:
+					present.add(name.strip().lower())
 				print(find_absent_students(set(present), full_roll))
 
 			case "4":
@@ -392,12 +402,12 @@ def class_menu():
 				print(list_class_files("records"))
 				print(safe_delete("old_report.txt"))
 			case "7":
-					name = input("Enter student name: ")
-					for student in students:
-						if student["name"].lower() == name.strip().lower():
-							print_report_card(student, students)
-							print(				celebrate_student(student["name"], 0, student["score"], student["grade"]))
-							break
+				name = name.strip().lower()
+				for student in students:
+					if student["name"].lower() == name:
+						print_report_card(student, students)
+						print(				celebrate_student(student["name"], 0, student["score"], student["grade"]))
+						break
 					else:
 						print("Student not found.")
 			case "0":

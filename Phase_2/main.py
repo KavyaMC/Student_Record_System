@@ -1,5 +1,12 @@
 import os
-from Phase_1.main import write_report, log_honour_roll, compare_classes, find_absent_students
+from Phase_1.main import (
+	write_report,
+	log_honour_roll,
+	compare_classes,
+	find_absent_students,
+	honour_roll,
+	celebrate_student
+	)
 
 student_list = [
 	{'name':'Amit',   'score':88,'grade':'B','attendance':[18,20,17,19],'note':'Consistent and focused.'},
@@ -83,7 +90,7 @@ def write_attendance(student_folder, sessions):
 		with open(student_folder+"/attendance.txt", "a") as f:
 			for number in sessions:
 				f.write(str(number)+"\n")
-		return "success! Attendence updated"
+		return "success! Attendance updated"
 	except FileNotFoundError as e:
 		return f"error: Failed! {e}"
 
@@ -93,7 +100,7 @@ def read_attendance(student_folder):
 		with open(student_folder+"/attendance.txt", "r") as f:
 			data=f.readlines()
 			for line in data:
-				attendance_list.append(int(line))
+				attendance_list.append(int(line.strip()))
 		return attendance_list
 	except:
 		return []
@@ -104,6 +111,104 @@ def total_attendance(student_folder):
 	for number in numbers:
 		total+=number
 	return total
+
+def safe_delete(filepath):
+	try:
+		if os.path.exists(filepath):
+			os.remove(filepath)
+		return "Success! File deleted."
+	except Exception as e:
+		return f"Error: {e}"
+
+def list_student_folders(base_folder):
+	try:
+		current_location = os.getcwd()
+		os.chdir(base_folder)
+		data=os.listdir()
+		folders=[]
+		files=[]
+		for each in data:
+			if os.path.isdir(each):
+				folders.append(each)
+			else:
+				files.append(each)
+				if each.startswith("old_"):
+					safe_delete(each)
+					continue
+		os.chdir(current_location)
+		return folders
+	except Exception as e:
+		return f"Error: {e}"
+
+def search_student(students, name):
+	index=0
+	while index < len(students):
+		if name .lower() == students[index]["name"].lower():
+			return index
+		index+=1
+	return -1
+
+def read_student_note(student_folder):
+	try:
+		with open(student_folder+"/notes.txt", "r") as f:
+			return f.readline().strip()
+	except FileNotFoundError:
+		return "error: file not found"
+
+def read_all_notes(student_folder):
+	try:
+		lines=[]
+		with open(student_folder+"/notes.txt", "r") as f:
+			lines.append(f.readline().strip())
+			data=f.readlines()
+			for line in data:
+				lines.append(line.strip())
+		return lines
+	except:
+		return []
+
+def update_student_info(base_folder, name, new_score):
+	file_path = os.path.join(base_folder, name.lower())
+	student=read_student_info(file_path)
+	if student==None:
+		return "student not found"
+	student["score"]=int(new_score)
+	if new_score >= 90:
+		student["grade"]="A"
+	elif new_score >= 75:
+		student["grade"]="B"
+	elif new_score >= 60:
+		student["grade"]="C"
+	elif new_score >= 50:
+		student["grade"]="D"
+	else:
+		student["grade"]="F"
+
+	try:
+		with open(os.path.join(file_path, "info.txt"), "w") as f:
+			for key in student:
+				f.write(f"{key}: {student[key]}\n")
+		return "student info updated succesffully!"
+	except:
+		return "error writing file"
+
+def print_report_card(student, students, base_folder):
+	try:
+		note=read_student_note(os.path.join(base_folder, student["name"].lower()))
+		if note == "error: file not found":
+			return "student record incomplete"
+		roll=honour_roll(students)
+		student["note"]=note
+		for name in roll:
+			if student["name"].lower() == name.lower():
+				student["honour roll"]="on honour roll"
+				break
+		else:
+			student["honour roll"]="not on honour roll"
+		return student
+	except Exception as e:
+		return f"error: {e}"
+
 # Part 12 — The Phase 2 Menu
 def class_menu():
 
@@ -157,11 +262,30 @@ def class_menu():
 				print(find_absent_students(set(present), full_roll))
 
 			case "7":
-				print(f"{options[int(choice)-1]} in development")
+				name=input("Enter student name: ").strip().lower()
+				try:
+					new_score=int(input("Enter new score (0, 100): "))
+				except ValueError:
+					return "invalid input"
+				message=update_student_info("Phase_2", name, new_score)
+				print(message)
+
 			case "8":
-				print(f"{options[int(choice)-1]} in development")
+				print(list_student_folders("Phase_2"))
+
 			case "9":
-				print(f"{options[int(choice)-1]} in development")
+				name=input("Enter student name: ").strip().lower()
+				student_dict={}
+				for student in students:
+					if name.lower() == student["name"].lower():
+						student_dict=student
+				if student_dict == {}:
+					print("student not found")
+				else:
+					result = print_report_card(student_dict, students, "Phase_2")
+					print(result)
+					print(celebrate_student(student_dict["name"], 0, student_dict["score"], student_dict["grade"]))
+
 			case "0":
 				print("Good bye")
 				break
