@@ -1,4 +1,8 @@
 import os
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+STUDENTS_FILE = os.path.join(BASE_DIR, "students.txt")
+REPORT_FILE = os.path.join(BASE_DIR, "report.txt")
+RECORDS_DIR = os.path.join(BASE_DIR, "records")
 class_a = ['Amit', 'anisha ', 'KAVYA', 'pratham']
 class_b = [' Pooja', 'Varsha', 'kavya', 'Rahul']
 full_roll = {'Amit', ' Anisha ', 'KAVYA', 'Pratham', 'Pooja', 'Varsha', 'Shubham', 'Virat', 'Shiva'}
@@ -24,7 +28,7 @@ def read_students(file_name):
 				students.append(data)
 
 	except FileNotFoundError:
-		print("students.txt not found")
+		print(f"{file_name} not found")
 	return students
 
 # Part 3 — Score Analysis
@@ -311,7 +315,7 @@ def read_summary_lines(filename):
 		return report
 
 def print_report_card(student, students):
-	data=read_summary_lines("report.txt")
+	data = read_summary_lines(REPORT_FILE)
 	print(data["first_line"]+"\n")
 	name=student["name"].strip().title()
 	honour_names=honour_roll(students)
@@ -344,7 +348,7 @@ def celebrate_student(name, streak, score, grade):
 
 # Part 1 — The Interactive Menu
 def class_menu():
-	students=read_students("students.txt")
+	students = read_students(STUDENTS_FILE)
 	while True:
 		print("--Main Menu--")
 		print(f"{len(students)} records were loaded")
@@ -357,9 +361,9 @@ def class_menu():
 		print("7. Student report card")
 		print("0. Exit")
 		choice=input("Enter your choice: ")
+
 		match choice:
 			case "1":
-
 				print(f"---CLASS REPORT---")
 				for key, value in class_report(students).items():
 					print(f"{key}: {value}")
@@ -371,10 +375,10 @@ def class_menu():
 				print(f"---TOP GRADE---")
 				print(top_grade(students)+"\n")
 
-				print(write_report("report.txt", students))
+				print(write_report(REPORT_FILE, students))
 
 			case "2":
-				print(log_honour_roll("report.txt", students))
+				print(log_honour_roll(REPORT_FILE, students))
 			case "3":
 				data=input("Enter names (comma separated): ")
 				raw = data.split(",")
@@ -386,9 +390,9 @@ def class_menu():
 			case "4":
 				name=input("Enter student name: ")
 				new_score=int(input("Enter revised student marks: "))
-				result = update_student_file("students.txt", name, new_score)
+				result = update_student_file(STUDENTS_FILE, name, new_score)
 				print(result)
-				students = read_students("students.txt")
+				students = read_students(STUDENTS_FILE)
 
 			case "5":
 				id_value = get_valid_integer(		"Enter student ID: ", 2000, 3000)
@@ -399,17 +403,19 @@ def class_menu():
 					print(f"Student ID found at position {position}.")
 
 			case "6":
-				print(list_class_files("records"))
-				print(safe_delete("old_report.txt"))
+				print(list_class_files(RECORDS_DIR))
+				print(safe_delete(os.path.join(RECORDS_DIR, "old_report.txt")))
+
 			case "7":
-				name = name.strip().lower()
+				name = input("Enter student name: ").strip().lower()
 				for student in students:
 					if student["name"].lower() == name:
 						print_report_card(student, students)
 						print(				celebrate_student(student["name"], 0, student["score"], student["grade"]))
 						break
-					else:
-						print("Student not found.")
+				else:
+					print("Student not found.")
+
 			case "0":
 				print(enforce_pass_threshold(marks_matrix, 76.5))
 				input("Press enter to continue")
@@ -417,3 +423,6 @@ def class_menu():
 				break
 			case _:
 				print("invalid choice.")
+
+if __name__ == "__main__":
+	class_menu()
