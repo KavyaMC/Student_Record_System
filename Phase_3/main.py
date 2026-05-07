@@ -64,6 +64,35 @@ class Student:
 		except Exception as e:
 			return f"error: {e}"
 
+	@classmethod
+	def load_from_folder(cls, folder_path):
+		try:
+			lines={}
+			with open(os.path.join(folder_path, "info.txt"), "r") as f:
+				for line in f:
+					parts=line.split(":")
+					if len(parts) >2:
+						key=parts[0].strip().lower()
+						value=parts[1].strip()
+						lines[key]=value
+			attendance=[]
+			with open(os.path.join(folder_path, "attendance.txt"), "r") as f:
+				for line in f:
+					attendance.append(line)
+					lines["attendance"]=attendance
+			with open(os.path.join(folder_path, "notes.txt"), "r") as f:
+				lines["note"]=f.readline()
+			return cls(lines["name"], lines["score"], lines["attendance"], lines["note"])
+		except Exception as e:
+			return f"error: {e}"
+
+# Part 22 — Dunder Methods and the Roster
+	def __str__(self):
+		return f"name: {self.name}\n score: {self.score}\n grade: {self._calculate_grade()}\n attendance: {self.attendance}\n note: {self.note}"
+
+	def __repr__(self):
+		return f"{self.name} {self.score} {self._calculate_grade()} {self.attendance} {self.note}"
+
 # Part 20 — The Phase 3 Menu
 def class_menu():
 	options=[
@@ -75,6 +104,7 @@ def class_menu():
 		"Reload individual student from disk",
 		"Reload full roster"
 	]
+	S1=Student("amit", 88, [17, 22, 3], "Well Done")
 	title=str("Student Record System").strip().upper().center(40)
 	while True:
 		print(f"{title}\n")
@@ -88,13 +118,21 @@ def class_menu():
 			case "2":
 				print(f"{options[int(choice)-1]} in {title} menu in development.")
 			case "3":
-				print(f"{options[int(choice)-1]} in {title} menu in development.")
+				new_score=int(input("Enter student score: ").strip())
+				S1.update_score(new_score)
+
 			case "4":
-				print(f"{options[int(choice)-1]} in {title} menu in development.")
+				name=input("Enter student name: ").strip().lower()
+				session=int(input("Enter student attendance: ").strip())
+				S1.log_attendance(session)
+				S1.save_to_disk("Phase_3")
+
 			case "5":
 				print(f"{options[int(choice)-1]} in {title} menu in development.")
 			case "6":
-				print(f"{options[int(choice)-1]} in {title} menu in development.")
+				name=input("Enter student name: ").strip().lower()
+				Student.load_from_folder("Phase_3/"+name)
+
 			case "7":
 				print(f"{options[int(choice)-1]} in {title} menu in development.")
 			case "0":
