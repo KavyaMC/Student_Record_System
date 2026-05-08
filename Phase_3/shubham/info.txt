@@ -1,3 +1,0 @@
-name: Shubham
-score: 67
-grade: C

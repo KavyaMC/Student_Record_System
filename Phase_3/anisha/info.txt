@@ -1,3 +1,0 @@
-name: Anisha
-score: 95
-grade: A

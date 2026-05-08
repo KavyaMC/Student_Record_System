@@ -1,3 +1,0 @@
-name: Shiva
-score: 78
-grade: B

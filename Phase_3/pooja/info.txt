@@ -1,3 +1,0 @@
-name: Pooja
-score: 61
-grade: C
