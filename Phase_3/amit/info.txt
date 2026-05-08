@@ -1,2 +1,3 @@
 name: Amit
 score: 88
+grade: B
